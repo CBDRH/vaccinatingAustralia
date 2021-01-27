@@ -1,0 +1,239 @@
+---
+title: 'Vaccinating Australia: How long will it take?'
+authors:
+  - name: Mark Hanly
+    department: Centre for Big Data Research in Health
+    affiliation: UNSW Sydney
+    location: Sydney 2052
+    email: m.hanly@unsw.edu.au
+  - name: Tim Churches
+    department: Ingham Institute for Applied Medical Research
+    affiliation: South Western Sydney Clinical School, Faculty of Medicine, UNSW Sydney
+    location: Liverpool
+    email: timothy.churches@unsw.edu.au
+  - name: Oisín Fitzgerald
+    department: Centre for Big Data Research in Health
+    affiliation: UNSW Sydney
+    location: Sydney 2052
+    email: o.fitzgerald@unsw.edu.au
+  - name: Louisa Jorm
+    department: Centre for Big Data Research in Health
+    affiliation: UNSW Sydney
+    location: Sydney 2052
+    email: l.jorm@unsw.edu.au
+abstract: |
+  Enter the text of your abstract here.
+keywords:
+  - COVID19
+  - vaccination
+bibliography: references.bib
+biblio-style: unsrt
+output: 
+  rticles::arxiv_article:
+    keep_tex: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, error = FALSE, message = FALSE)
+
+# libraries
+library(dplyr)
+library(kableExtra)
+
+# Source functions
+source('../R/sumScenario.R')
+source('../R/plotScenario.R')
+
+# Load scenario data
+load('../Outputs/sc1.rda')
+load('../Outputs/sc2.rda')
+load('../Outputs/sc3.rda')
+load('../Outputs/sc4.rda')
+load('../Outputs/sc5.rda')
+load('../Outputs/sc6.rda')
+load('../Outputs/sc7.rda')
+load('../Outputs/sc8.rda')
+
+```
+
+
+# Introduction
+
+* Internationally, COVID19 continues to have devastating health and economic impacts. 
+* In Australia, we have escaped much of the worst of the health impacts, through a combination of border closures, lock down measures and effective track and trace. 
+* However this has come at a massive cost for many industries, including tourism, airlines, retails, the arts , international students etc. 
+* A safe and effective vaccine is the best bet to return to normal.
+* Several viable vaccines have been developed or are close to completion, and Israel, The US and the UK have already begun to roll out national vaccination programs. 
+* The Australian government has procured the Phizer and Astra-Zeneca vaccines (others?) and have released a national rollout strategy. 
+* This strategy identifies 16 populations groups, ranked in priority across five vaccination phases (see Table 1). 
+* Hospital hubs with cold chain storage facilities will administer the Phizer vaccine to the highest priority groups scheduled in Phase 1a.
+* Target of 80,000 vaccinations a day. 
+* A back of the envelope calculation would suggest it would take 500 days to vaccinate 20 million adult Australians twice. 
+* But there are some complications e.g. timing of second doses and vaccine hesitancy; we are going to need a bigger envelope. 
+* Aim of this analysis is to calculate how long it will take the vaccinate the whole Australian population
+
+
+```{r}
+t1 <- data.frame(
+        phase = c('1a1', '1a2', '1a3', '1a4', '1b1', '1b2', '1b3', '1b4', '1b5', '1b6', '2a1', '2a2', '2a3', '2a4', '2b', '3'),
+        desc = c('Quarantine & border workers',
+                    'Frontline health care workers',
+                    'Aged care and disability care staff',
+                    'Aged care and disability care residents',
+                    'Elderly adults aged 80 years and over',
+                    'Elderly adults aged 70-79 years',
+                    'Other health care workers',
+                    'Aboriginal and Torres Strait Islander people aged 55 years and over',
+                    'Younger adults with an underlying medical condition',
+                    'Critical and high risk workers',
+                    'Adults aged 60-69',
+                    'Adults aged 50-59',
+                    'Aboriginal and Torres Strait Islander people aged 18-54',
+                    'Other critical and high risk workers',
+                    'Balance of adult population',
+                    '<18 if recommended'),
+                size = format(c(70000, 100000, 318000, 190000, 1045000, 1858000, 953000, 87000, 2000000, 196000, 2650000, 3080000, 387000, 453000, 6643000, 5670000), big.mark = ','))
+
+kbl(t1,
+      format = 'latex',
+      booktabs = TRUE,
+      linesep = '',
+      align = c('llr'),
+      col.names = c("Phase", "Description", "Size"),
+      caption = "Australia’s COVID-19 vaccine national roll-out strategy") %>%
+      kable_styling(latex_options = c("hover", "striped", "HOLD_position"),
+                    full_width = FALSE,
+                    position = "center") %>% 
+      column_spec(1, bold = T, width = '1cm') %>%
+      column_spec(2, width = '11cm') %>% 
+      column_spec(3, width = '2cm') %>% 
+      add_footnote('Adapted from https://www.health.gov.au/sites/default/files/documents/2021/01/australia-s-covid-19-vaccine-national-roll-out-strategy.pdf', notation = 'none', threeparttable = TRUE)
+```
+
+# Methods
+
+* Vary three factors with two levels each resulting in 8 scenarios (see Table 2)
+* Daily vaccination capacity (60,000 versus 80,000) 
+* Timing between first and second dose (3 to 6 weeks, versus 3 to 12 weeks)
+* Vaccine hesitancy (7% versus 13%) based on recent survey data from Edwards et al (the projections assume taht hesitancy applies to general population groups but not to health or border workers, age care residents or those with an underlying condition)
+* Assume that the vaccine is administered according to the priority phases set out by the government
+* All groups within a given phase are given equal priority
+* Daily capacity is first divided between those needing second dose to ensure all second doses are delivered within the specified window; the remainder of the daily capacity distributed among those requiring their first dose. 
+
+
+
+
+```{r}
+
+t2 <- data.frame(
+  scenario = seq(1,8),
+  capacity = c(rep('80,000', 4), rep('60,000', 4)),
+  gap = c(rep('3 to 6 weeks', 2), rep('3 to 12 weeks', 2), rep('3 to 6 weeks', 2), rep('3 to 12 weeks', 2)),
+  hesitancy = c('7%', '13%', '7%', '13%', '7%', '13%', '7%', '13%')
+)
+
+
+kbl(t2,
+      format = 'latex',
+      booktabs = TRUE,
+      linesep = '',
+      align = c('lrrr'),
+      col.names = c("Scenario", "Capacity (units per day)", "Gap between doses", "Hesitancy"),
+      caption = "Projection scenarios" ) %>%
+      kable_styling(latex_options = c("hover", "striped", "HOLD_position"),
+                    full_width = TRUE,
+                    position = "center") %>% 
+      column_spec(1, bold = T)
+
+```
+
+# Results
+
+* Under the most optimistic Scenario (Scenario 1), assuming vaccination starts on March 1, the highest priority group would be fully vaccinated with two doses by April 16th, just over six weeks (see Table 4).
+* However it would still take nearly nine months to complete Phase 2a, which includes adults aged 60-69 years. 
+* It would take until July 2022 to fully vaccinate the adult population and a further four months after that to vaccinate those under 18.
+* Under this scenario, we would reach 50% population coverage in February 2022 and 75% population coverage in July 2022 (See Figure 1A)
+
+* Under less optimistic scenarios it would take until the end of 2022 to vaccinate the adult population. (see Table 4)
+* Under this scenario, we would reach 50% population coverage in May 2022 and 75% population coverage in December 2022 (See Figure 1B) 
+
+```{r}
+
+t3 <- rbind(
+        sumScenario(sc1),
+        sumScenario(sc2),
+        sumScenario(sc3),
+        sumScenario(sc4),
+        sumScenario(sc5),
+        sumScenario(sc6),
+        sumScenario(sc7),
+        sumScenario(sc8)
+        ) %>%
+    mutate(scenario = row_number()) %>%
+    relocate("scenario")
+
+  kbl(t3,
+    format = 'latex',
+    booktabs = TRUE,
+    linesep = '', 
+    align = c('lrrr'),
+    col.names = c("Scenario", "Number of vaccinations", "Individuals vaccinated", "Population coverage",
+                  "Phase 1a complete", "Phase 1b complete", "Phase 2a complete", "Phase 2b complete", "Phase 3 complete"),
+    caption = "Summary of vaccine rollout projects for different scenarios" ) %>%
+  kable_styling(latex_options = c("hover", "striped", "HOLD_position"),
+                full_width = TRUE,
+                position = "center") %>%
+  column_spec(1, bold = T)
+
+```
+
+
+
+```{r}
+
+fig1a <- plotScenario(sc1, 'A. Scenario 1 (80,000 units per day)')
+fig1b <- plotScenario(sc7, 'B. Scenario 7 (60,000 units per day)')
+
+ggpubr::ggarrange(fig1a, fig1b,
+                  ncol = 1, 
+                  common.legend = TRUE, 
+                  legend = 'bottom')
+
+```
+
+
+
+# Discussion
+
+* Don't book your summer holidays just yet.
+
+# Examples of citations, figures, tables, references
+\label{sec:others}
+
+The documentation for \verb+natbib+ may be found at
+\begin{center}
+  \url{http://mirrors.ctan.org/macros/latex/contrib/natbib/natnotes.pdf}
+\end{center}
+Of note is the command \verb+\citet+, which produces citations
+appropriate for use in inline text.  For example,
+
+\begin{verbatim}
+   \citet{hasselmo} investigated\dots
+\end{verbatim}
+
+produces
+
+\begin{quote}
+  Hasselmo, et al.\ (1995) investigated\dots
+\end{quote}
+
+\begin{center}
+  \url{https://www.ctan.org/pkg/booktabs}
+\end{center}
+
+
+
+
+
+
+
