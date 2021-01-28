@@ -118,5 +118,39 @@ return(list(
 
 
 
+#'
+#'
+#' @param sc
+#' @param units
+#' @param units_eps
+#'
+check_results <- function(sc,units,gapEnd,gapStart,units_eps=10) {
+
+    with(sc,{
+        # check only vaccinate units per day
+        tmp <- dataOut %>%
+            group_by(t) %>%
+            summarise(n=sum(n),.groups="drop")
+        cat("1",all(tmp$n <= (units + units_eps)),"\n") # all
+        # check everyone is vaccinated twice
+        d1 <- doses %>% filter(dose == 1) %>% .$n %>% sum()
+        d2 <- doses %>% filter(dose == 2) %>% .$n %>% sum()
+        cat("2",d1 == d2,"\n")
+        # total given 2nd dose at t+gapEnd
+        tmp1 <- doses %>%
+            filter(dose == 1) %>%
+            group_by(t) %>%
+            summarise(n = sum(n),.groups="drop") %>%
+            summarise(n = cumsum(n),.groups="drop")
+        tmp2 <- doses %>%
+            filter(dose == 2) %>%
+            group_by(t) %>%
+            summarise(n = sum(n),.groups="drop") %>%
+            summarise(n = cumsum(n),.groups="drop")
+        N <- nrow(tmp2)
+        cat("3",all(tmp2$n[gapEnd:N] >= tmp2$n[1:(N-gapEnd+1)]),"\n")
+        cat("4",all(tmp2$n[gapStart:N] <= tmp1$n[1:(N-gapStart+1)]),"\n")
+    })
+}
 
 
