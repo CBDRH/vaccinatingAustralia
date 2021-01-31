@@ -40,9 +40,9 @@ p <- ggplot() +
     scale_y_continuous(name = 'Percent', labels = scales::percent, limits = c(0,1.1),
                        breaks = seq(0, 1, by = 0.25), minor_breaks = NULL) +
     scale_x_date(name = 'Date', date_labels = '%b%y',
-                 breaks = seq(as.Date('2021/03/01'), as.Date('2023/06/01'), by = 'quarter'),
-                 minor_breaks = NULL,
-                 limits = c(as.Date('2021/02/01'), as.Date('2023/07/01'))) +
+                 breaks = seq(as.Date('2021/01/01'), as.Date('2023/07/31'), by = 'quarter'),
+                 minor_breaks = 'month',
+                 limits = c(as.Date('2021/01/01'), as.Date('2023/07/31'))) +
     scale_fill_manual(name=NULL,
                       values = c(brewer.pal(9, 'YlOrRd')[1],
                                  brewer.pal(9, 'YlOrRd')[3])) +

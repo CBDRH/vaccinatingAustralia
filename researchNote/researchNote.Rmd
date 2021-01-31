@@ -54,7 +54,7 @@ load('../Outputs/sc5.rda')
 load('../Outputs/sc6.rda')
 load('../Outputs/sc7.rda')
 load('../Outputs/sc8.rda')
-
+load('../Outputs/sc9.rda')
 ```
 
 
@@ -242,18 +242,52 @@ kbl(t3,
   kable_styling(latex_options = c("hover", "striped", "HOLD_position"),
                 full_width = TRUE,
                 position = "center") %>%
-  column_spec(1, bold = T)
+  column_spec(1, bold = T) 
+
+```
+
+
+```{r, fig.align='center', fig.cap='Daily COVID-19 vaccines administered per one million population', fig.subcap='(source: ourworldindata.org'}
+
+# Data on daily vaccinations sourced from Our World in Data
+dailyVac <- readr::read_csv('https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/vaccinations/vaccinations.csv')
+
+dv1 <- dailyVac %>% filter(location %in% c('United States',
+                                    'United Kingdom',
+                                    'European Union',
+                                    'Serbia',
+                                    'Canada',
+                                    'Israel')) %>% 
+                    filter(date >= as.Date("2021/01/01")) 
+
+ggplot(dv1, 
+       aes(x = date, 
+           y = daily_vaccinations_per_million, 
+           group = location,
+           color = location)) +
+    geom_line(size = 1.2) +
+    scale_y_continuous(name = 'Daily vaccinations per milliom', 
+                       labels = scales::comma_format()) +
+    scale_x_date(name = 'Date', date_labels = '%d %b',
+                 breaks = 'week',
+                 limits = c(as.Date('2021/01/01'), Sys.Date())) +
+    scale_color_discrete(name = 'Country') +
+    theme_dark() +
+    labs(caption = "Data source: ourworldindata.org")
+    
+
 
 ```
 
 
 
-```{r, fig.cap='Cumulative vaccine doses of time'}
+```{r, fig.cap='Cumulative vaccine doses over time', fig.height=9, fig.width=6.5, fig.align='center'}
 
-fig1a <- plotScenario(sc1, 'A. Scenario 1 (80,000 units per day)')
-fig1b <- plotScenario(sc7, 'B. Scenario 7 (60,000 units per day)')
+fig1a <- plotScenario(sc7, 'A. Scenario 7 (60,000 units per day)')
+fig1b <- plotScenario(sc1, 'B. Scenario 1 (80,000 units per day)')
+fig1c <- plotScenario(sc9, 'C. Scenario 9 (160,000 units per day)')
 
-ggpubr::ggarrange(fig1a, fig1b,
+ggpubr::ggarrange(fig1a, fig1b, fig1c,
                   ncol = 1, 
                   common.legend = TRUE, 
                   legend = 'bottom')

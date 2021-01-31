@@ -196,8 +196,9 @@ resulted in an estimated population size of 25.7 million people,
 including 5.67 million under the age of 18. Equal priority was given to
 all groups within the same phase.
 
-\hypertarget{roll-out-projections}{%
-\subsection{Roll out projections}\label{roll-out-projections}}
+\hypertarget{vaccine-roll-out-projections}{%
+\subsection{Vaccine roll out
+projections}\label{vaccine-roll-out-projections}}
 
 Roll out projections were based on four parameters:
 
@@ -205,11 +206,14 @@ Roll out projections were based on four parameters:
 \def\labelenumi{\arabic{enumi}.}
 \tightlist
 \item
-  The number of daily available vaccine units \(units_i\)
+  The daily vaccination capacity. We denote the available units on day
+  \(i\) as \(units_i\).
 \item
-  The minimum time between the first dose and the second dose.
+  The minimum number of days between the first dose and the second dose,
+  denoted \(minDose\).
 \item
-  The maximum time between the first dose and the second dose.
+  The maximum number of days between the first dose and the second dose,
+  denoted \(maxDose\).
 \item
   Vaccine hesitancy
 \end{enumerate}
@@ -218,11 +222,21 @@ Roll out projections were based on four parameters:
 \subsection{Vaccine allocation}\label{vaccine-allocation}}
 
 We allocated the daily available vaccination doses according to the
-following broad steps:
+following algorithm:
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \item
+  Calculate the number of second doses due.
+\item
+  Calculate the number of first doses available as
+  \(firstDoses_i = units_i - secondDoses_i\)
+\item
+  Identify the highest priority phase that haven't received all first
+  doses
+\item
+  Divide the available first doses between the subgroups in the highest
+  priority phase, proportional to the
 \end{enumerate}
 
 \hypertarget{projection-scenarios}{%
@@ -313,22 +327,34 @@ Scenario & Capacity (units per day) & Gap between doses & Hesitancy\\
 \toprule
 Scenario & Number of vaccinations & Individuals vaccinated & Population coverage & Phase 1a complete & Phase 1b complete & Phase 2a complete & Phase 2b complete & Phase 3 complete\\
 \midrule
-\textbf{\cellcolor{gray!6}{1}} & \cellcolor{gray!6}{48,337,780} & \cellcolor{gray!6}{24,168,890} & \cellcolor{gray!6}{94.0} & \cellcolor{gray!6}{16/04/21} & \cellcolor{gray!6}{29/08/21} & \cellcolor{gray!6}{26/01/22} & \cellcolor{gray!6}{02/07/22} & \cellcolor{gray!6}{09/11/22}\\
-\textbf{2} & 45,713,020 & 22,856,510 & 88.9 & 16/04/21 & 28/08/21 & 12/01/22 & 07/06/22 & 05/10/22\\
-\textbf{\cellcolor{gray!6}{3}} & \cellcolor{gray!6}{48,337,780} & \cellcolor{gray!6}{24,168,890} & \cellcolor{gray!6}{94.0} & \cellcolor{gray!6}{28/05/21} & \cellcolor{gray!6}{29/09/21} & \cellcolor{gray!6}{23/02/22} & \cellcolor{gray!6}{29/07/22} & \cellcolor{gray!6}{08/12/22}\\
-\textbf{4} & 45,713,020 & 22,856,510 & 88.9 & 28/05/21 & 27/09/21 & 09/02/22 & 05/07/22 & 06/11/22\\
-\textbf{\cellcolor{gray!6}{5}} & \cellcolor{gray!6}{48,337,780} & \cellcolor{gray!6}{24,168,890} & \cellcolor{gray!6}{94.0} & \cellcolor{gray!6}{19/04/21} & \cellcolor{gray!6}{25/10/21} & \cellcolor{gray!6}{11/05/22} & \cellcolor{gray!6}{03/12/22} & \cellcolor{gray!6}{26/05/23}\\
-\textbf{6} & 45,713,020 & 22,856,510 & 88.9 & 19/04/21 & 22/10/21 & 21/04/22 & 28/10/22 & 16/04/23\\
-\textbf{\cellcolor{gray!6}{7}} & \cellcolor{gray!6}{48,337,780} & \cellcolor{gray!6}{24,168,890} & \cellcolor{gray!6}{94.0} & \cellcolor{gray!6}{31/05/21} & \cellcolor{gray!6}{18/11/21} & \cellcolor{gray!6}{07/06/22} & \cellcolor{gray!6}{30/12/22} & \cellcolor{gray!6}{26/06/23}\\
-\textbf{8} & 45,713,020 & 22,856,510 & 88.9 & 31/05/21 & 12/11/21 & 20/05/22 & 29/11/22 & 14/05/23\\
+\textbf{\cellcolor{gray!6}{1}} & \cellcolor{gray!6}{48,337,780} & \cellcolor{gray!6}{24,168,890} & \cellcolor{gray!6}{94.0} & \cellcolor{gray!6}{04/04/21} & \cellcolor{gray!6}{21/08/21} & \cellcolor{gray!6}{25/01/22} & \cellcolor{gray!6}{27/06/22} & \cellcolor{gray!6}{06/11/22}\\
+\textbf{2} & 45,713,020 & 22,856,510 & 88.9 & 18/04/21 & 01/09/21 & 22/01/22 & 18/06/22 & 19/10/22\\
+\textbf{\cellcolor{gray!6}{3}} & \cellcolor{gray!6}{48,337,780} & \cellcolor{gray!6}{24,168,890} & \cellcolor{gray!6}{94.0} & \cellcolor{gray!6}{30/05/21} & \cellcolor{gray!6}{09/10/21} & \cellcolor{gray!6}{10/03/22} & \cellcolor{gray!6}{13/08/22} & \cellcolor{gray!6}{23/12/22}\\
+\textbf{4} & 45,713,020 & 22,856,510 & 88.9 & 30/05/21 & 05/10/21 & 23/02/22 & 19/07/22 & 20/11/22\\
+\textbf{\cellcolor{gray!6}{5}} & \cellcolor{gray!6}{48,337,780} & \cellcolor{gray!6}{24,168,890} & \cellcolor{gray!6}{94.0} & \cellcolor{gray!6}{21/04/21} & \cellcolor{gray!6}{01/11/21} & \cellcolor{gray!6}{24/05/22} & \cellcolor{gray!6}{17/12/22} & \cellcolor{gray!6}{11/06/23}\\
+\textbf{6} & 45,713,020 & 22,856,510 & 88.9 & 21/04/21 & 27/10/21 & 05/05/22 & 14/11/22 & 28/04/23\\
+\textbf{\cellcolor{gray!6}{7}} & \cellcolor{gray!6}{48,337,780} & \cellcolor{gray!6}{24,168,890} & \cellcolor{gray!6}{94.0} & \cellcolor{gray!6}{02/06/21} & \cellcolor{gray!6}{02/12/21} & \cellcolor{gray!6}{24/06/22} & \cellcolor{gray!6}{16/01/23} & \cellcolor{gray!6}{11/07/23}\\
+\textbf{8} & 45,713,020 & 22,856,510 & 88.9 & 02/06/21 & 25/11/21 & 05/06/22 & 15/12/22 & 29/05/23\\
 \bottomrule
 \end{tabu}
 \end{table}
 
 \begin{figure}
-\centering
-\includegraphics{researchNote_files/figure-latex/unnamed-chunk-5-1.pdf}
-\caption{Cumulative vaccine doses of time}
+
+{\centering \includegraphics{researchNote_files/figure-latex/unnamed-chunk-5-1} 
+
+}
+
+\caption{Daily COVID-19 vaccines administered per one million population}\label{fig:unnamed-chunk-5}
+\end{figure}
+
+\begin{figure}
+
+{\centering \includegraphics{researchNote_files/figure-latex/unnamed-chunk-6-1} 
+
+}
+
+\caption{Cumulative vaccine doses over time}\label{fig:unnamed-chunk-6}
 \end{figure}
 
 \hypertarget{discussion}{%
