@@ -27,13 +27,13 @@ phases <- scenario$doses %>%
 p <- ggplot() +
     geom_rect(data = dates,
               aes(xmin = x1, xmax = x2, ymin = y1, ymax = y2),
-              fill = brewer.pal(9, 'YlOrRd')[1:5]) +
+              fill = brewer.pal(9, 'Reds')[1:5]) +
     geom_text(data=dates,
               aes(x = x1, y = y1, label = phaseX),
               size = 4,
               nudge_x = -20,
               nudge_y = .05,
-              color = brewer.pal(9, 'YlOrRd')[1:5]) +
+              color = brewer.pal(9, 'Reds')[1:5]) +
     geom_bar(data = phases,
              aes(x = date, y = cumlPct/2, group = schedule, fill = schedule),
              stat = 'identity', position = 'stack', width = 2) +

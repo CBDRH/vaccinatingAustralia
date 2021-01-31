@@ -28,6 +28,7 @@ keywords:
   - vaccination
 bibliography: references.bib
 biblio-style: unsrt
+csl: jama.csl
 output: 
   rticles::arxiv_article:
     keep_tex: true
@@ -59,15 +60,42 @@ load('../Outputs/sc8.rda')
 
 # Introduction
 
-* Internationally, COVID19 continues to have devastating health and economic impacts. 
-* In Australia, we have escaped much of the worst of the health impacts, through a combination of border closures, lock down measures and effective track and trace. 
-* However this has come at a massive cost for many industries, including tourism, airlines, retails, the arts , international students etc. 
-* A safe and effective vaccine is the best bet to return to normal.
-* Several viable vaccines have been developed or are close to completion, and Israel, The US and the UK have already begun to roll out national vaccination programs. 
-* The Australian government has procured the Phizer and Astra-Zeneca vaccines (others?) and have released a national rollout strategy. 
-* This strategy identifies 16 populations groups, ranked in priority across five vaccination phases (see Table 1). 
-* Hospital hubs with cold chain storage facilities will administer the Phizer vaccine to the highest priority groups scheduled in Phase 1a.
-* Target of 80,000 vaccinations a day. 
+The COVID-19 pandemic continues to wreck devastating health impacts, having reached 100 million cases and 2.1 million deaths worldwide, as of 1 February 2021. The worsening crisis has led to the hospitals and ICU departments being overwhelmed in many countries. Australia has escaped the worst of these health impacts, through a combination of border closures, local and state-wide lock down measures and effective tracking and quarantining of exposed individuals. While effective in mitigating the spread of the virus, these measures have come at a massive cost for many industries, including tourism, aviation, retail, tertiary education and the arts. While the program of hotel quarantine has been largely effective in blocking transmission from international arrivals it is clearly not a panacea. Sporadic seeding events have spawned community clusters leading to further disruptive lockdowns in Victoria, Adelaide, Sydney and Brisbane.
+
+Several COVID-19 vaccines with promising clinical trial results have been developed or are close to completion, with national rollouts already begun in many countries including Israel, the United States and the United Kingdom. The Australian government has entered into four agreements for the supply of COVID-19 vaccines (Table \ref{tab:agreements}), with a view to starting vaccination in February. The national rollout strategy divides the population into 16 groups, organised into five phases (Table \ref{tab:phases}).   
+```{r}
+
+t0 <- data.frame(
+  name = c('Pfizer/BioNTech', 'University of Oxford AstraZeneca', 'Novavax', 'COVAX Facility'),
+  type = c('mRNA vaccine', 'Viral vector vaccine', 'Protein vaccine', 'Assorted'),
+  doses = c('10', '54', '51', '25'), 
+  schedule = c('2 doses 21 days apart', '2 doses 28 days apart', '2 doses 21 days apart', 'Assorted'),
+  status = c('Provisionally approved by the TGA',
+             'Phase 3 clinical trials',
+             'Phase 3 clinical trials', '9 candidate vaccines in various clinical trial stages')
+)
+  
+kbl(t0,
+      format = 'latex',
+      booktabs = TRUE,
+      linesep = '',
+      label = 'agreements', 
+      align = c('llcll'),
+      col.names = c("Name", "Type", "Doses (millions)", 'Schedule', 'Status'),
+      caption = "Australia’s vaccine agreements") %>%
+      kable_styling(latex_options = c("hover", "striped", "HOLD_position"),
+                    position = "center") %>% 
+      column_spec(1, width = '3cm') %>%
+      column_spec(2, width = '3cm') %>%
+      column_spec(3, width = '1cm') %>%
+      column_spec(4, width = '2cm') %>%
+      column_spec(5, width = '5cm') %>%
+      add_footnote('Adapted from https://www.health.gov.au/initiatives-and-programs/covid-19-vaccines/about-covid-19-vaccines/australias-vaccine-agreements', notation = 'none', threeparttable = TRUE)
+
+```
+
+Hospital hubs with access cold chain storage facilities will administer the Pfizer/BioNTech vaccine to the highest priority groups scheduled in Phase 1a, which includes border workers, frontline healthcare staff, and aged care staff and residents. The prime minister has set an optimistic target of 80,000 vaccines per day.[@pm2021] 
+
 * A back of the envelope calculation would suggest it would take 500 days to vaccinate 20 million adult Australians twice. 
 * But there are some complications e.g. timing of second doses and vaccine hesitancy; we are going to need a bigger envelope. 
 * Aim of this analysis is to calculate how long it will take the vaccinate the whole Australian population
@@ -75,7 +103,7 @@ load('../Outputs/sc8.rda')
 
 ```{r}
 t1 <- data.frame(
-        phase = c('1a1', '1a2', '1a3', '1a4', '1b1', '1b2', '1b3', '1b4', '1b5', '1b6', '2a1', '2a2', '2a3', '2a4', '2b', '3'),
+        phase = c('1a', '1a', '1a', '1a', '1b', '1b', '1b', '1b', '1b', '1b', '2a', '2a', '2a', '2a', '2b', '3'),
         desc = c('Quarantine & border workers',
                     'Frontline health care workers',
                     'Aged care and disability care staff',
@@ -98,6 +126,7 @@ kbl(t1,
       format = 'latex',
       booktabs = TRUE,
       linesep = '',
+      label = 'phases', 
       align = c('llr'),
       col.names = c("Phase", "Description", "Size"),
       caption = "Australia’s COVID-19 vaccine national roll-out strategy") %>%
@@ -112,6 +141,33 @@ kbl(t1,
 
 # Methods
 
+## Population and priority groups
+Our analysis was based on the 16 priority groups and five phases proposed by the Australian government (see Table \ref{tab:phases}). This resulted in an estimated population size of 25.7 million people, including 5.67 million under the age of 18. Equal priority was given to all groups within the same phase.
+
+## Vaccine roll out projections
+Roll out projections were based on four parameters: 
+
+1. The daily vaccination capacity. We denote the available units on day $i$ as $units_i$. 
+2. The minimum number of days between the first dose and the second dose, denoted $minDose$. 
+3. The maximum number of days between the first dose and the second dose, denoted $maxDose$. 
+4. Vaccine hesitancy
+
+## Vaccine allocation
+We allocated the daily available vaccination doses according to the following algorithm: 
+
+1. Calculate the number of second doses due. 
+
+2. Calculate the number of first doses available as $firstDoses_i = units_i - secondDoses_i$
+
+3. Identify the highest priority phase that haven't received all first doses
+
+4. Divide the available first doses between the subgroups in the highest priority phase, proportional to the 
+
+
+## Projection scenarios
+
+
+
 * Vary three factors with two levels each resulting in 8 scenarios (see Table 2)
 * Daily vaccination capacity (60,000 versus 80,000) 
 * Timing between first and second dose (3 to 6 weeks, versus 3 to 12 weeks)
@@ -120,6 +176,7 @@ kbl(t1,
 * All groups within a given phase are given equal priority
 * Daily capacity is first divided between those needing second dose to ensure all second doses are delivered within the specified window; the remainder of the daily capacity distributed among those requiring their first dose. 
 
+The analysis was performed using RStudio version 4.0.3. The source code can be accessed at https://github.com/CBDRH/vaccinatingAustralia. 
 
 
 
@@ -137,6 +194,7 @@ kbl(t2,
       format = 'latex',
       booktabs = TRUE,
       linesep = '',
+      label = 'scenarios', 
       align = c('lrrr'),
       col.names = c("Scenario", "Capacity (units per day)", "Gap between doses", "Hesitancy"),
       caption = "Projection scenarios" ) %>%
@@ -175,11 +233,12 @@ t3 <- rbind(
 kbl(t3,
     format = 'latex',
     booktabs = TRUE,
-    linesep = '', 
+    linesep = '',
+    label = 'projections', 
     align = c('lrrr'),
     col.names = c("Scenario", "Number of vaccinations", "Individuals vaccinated", "Population coverage",
                   "Phase 1a complete", "Phase 1b complete", "Phase 2a complete", "Phase 2b complete", "Phase 3 complete"),
-    caption = "Summary of vaccine rollout projects for different scenarios" ) %>%
+    caption = "Summary of vaccine rollout projections for different scenarios" ) %>%
   kable_styling(latex_options = c("hover", "striped", "HOLD_position"),
                 full_width = TRUE,
                 position = "center") %>%
@@ -189,7 +248,7 @@ kbl(t3,
 
 
 
-```{r}
+```{r, fig.cap='Cumulative vaccine doses of time'}
 
 fig1a <- plotScenario(sc1, 'A. Scenario 1 (80,000 units per day)')
 fig1b <- plotScenario(sc7, 'B. Scenario 7 (60,000 units per day)')
@@ -207,29 +266,7 @@ ggpubr::ggarrange(fig1a, fig1b,
 
 * Don't book your summer holidays just yet.
 
-# Examples of citations, figures, tables, references
-\label{sec:others}
-
-The documentation for \verb+natbib+ may be found at
-\begin{center}
-  \url{http://mirrors.ctan.org/macros/latex/contrib/natbib/natnotes.pdf}
-\end{center}
-Of note is the command \verb+\citet+, which produces citations
-appropriate for use in inline text.  For example,
-
-\begin{verbatim}
-   \citet{hasselmo} investigated\dots
-\end{verbatim}
-
-produces
-
-\begin{quote}
-  Hasselmo, et al.\ (1995) investigated\dots
-\end{quote}
-
-\begin{center}
-  \url{https://www.ctan.org/pkg/booktabs}
-\end{center}
+# References
 
 
 
