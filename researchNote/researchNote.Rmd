@@ -230,7 +230,7 @@ t3 <- rbind(
     mutate(scenario = row_number()) %>%
     relocate("scenario")
 
-  kbl(t3,
+kbl(t3,
     format = 'latex',
     booktabs = TRUE,
     linesep = '',

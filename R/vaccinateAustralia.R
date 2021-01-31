@@ -3,54 +3,76 @@
 vaccinateAustralia <- function(units, startDate, gapStart, gapEnd, hesitancy){
 
 # Define hesitant proportion
-hesitant <- setNames(as.data.frame(t(round(hesitancy * dist, digits = 1))), phase)
+hesitant <- setNames(as.data.frame(t(hesitancy * dist)), phase)
 
-doseOneRemaining <- setNames(as.data.frame(t(dist)), phase) - hesitant
-doseTwoRemaining <- setNames(as.data.frame(t(dist)), phase) - hesitant
-doseOneGiven <- setNames(as.data.frame(t(rep(0,16))), phase)
+# Doses administered on day 1 (all go to phase1 priority)
+doseOneGiven <- setNames(as.data.frame(t(c(units*dist[1:4]/sum(dist[1:4]), rep(0,12)))), phase)
 doseTwoGiven <- setNames(as.data.frame(t(rep(0,16))), phase)
-dosesGiven <- setNames(as.data.frame(t(rep(0,16))), phase)
-dosesRemaining <- setNames(as.data.frame(t(dist)), phase)
 
-i <- 1
-while (sum(dosesGiven) < (sum(dist) - sum(hesitant))*2) {
-     # Today's units for each dose
-    lower <- ifelse(i <= gapStart, 1, max(1, i - gapEnd))
+# Doses left to be done on day 1
+doseOneRemaining <- setNames(as.data.frame(t(dist)), phase) - hesitant - doseOneGiven
+doseTwoRemaining <- setNames(as.data.frame(t(dist)), phase) - hesitant
+
+dosesGiven <- doseOneGiven + doseTwoGiven
+dosesRemaining <- doseOneRemaining + doseTwoRemaining
+
+i <- 2 # DAy one is distributed above so start from day 2
+while (any(floor(doseTwoRemaining[i-1, ]) > 1)) {
+     # Lower and upper bounds for lookback period
+    lower <- ifelse(i <= gapStart, 1, max(1, i - gapEnd + 1))
     upper <- ifelse(i <= gapStart, 1, max(1, i - gapStart))
-    alottedDose2 <- pmin(round(colSums(doseOneGiven[lower:upper, ])/(gapEnd - gapStart), digits = 0),
-                         doseTwoRemaining[i, ])
 
-    alottedDose1 <- units - sum(alottedDose2)
+    needDose2 <- colSums(doseOneGiven[lower:upper, ])/(gapEnd - gapStart)
+
+    # Dose 2s are spread out over the specified gap: gapEnd - gapStart
+    alottedDose2 <- ifelse(i <= gapStart, 0,
+                           min(
+                               sum(needDose2),
+                               sum(doseTwoRemaining[i-1, ]), # don't give out more than required
+                               units # capped at the number of daily units
+                               )
+                        )
+    # What's left is assigned to dose 1
+    alottedDose1 <- units - alottedDose2
+
+    # Calculation to distribute allotted dose two doses
+
+    if (alottedDose2 > 0) {
+        distribution2 <- alottedDose2*needDose2/sum(needDose2)
+        } else distribution2 <- t(rep(0,16))
 
     # Calculation to distribute allotted dose one doses
+    if (alottedDose1 > 0 & sum(doseOneRemaining[i-1, ]) > 0){ # only assign if there is indeed some doses ones available
     df1 <- data.frame(phase = seq(1, length(dist)),
                      priority = c(rep(1,4), rep(2,6), rep(3,4), 4, 5),
-                     full = as.vector(doseOneRemaining[i, ] <= 0)
+                     full = as.vector(doseOneRemaining[i-1, ] <= 0)
     )
 
     df2 <- df1 %>% filter(!full)
 
     df3 <- df2 %>% filter(priority == min(priority))
 
-    df3$new <- pmin(round(alottedDose1*dist[df3$phase]/sum(dist[df3$phase]), digits = 0),
-                    doseOneRemaining[i, df3$phase])
+    df3$new <- pmin(alottedDose1*dist[df3$phase]/sum(dist[df3$phase]),
+                    doseOneRemaining[i-1, df3$phase])
 
-    distribution <- df1 %>%
+    distribution1 <- df1 %>%
         left_join(df3, by = 'phase') %>%
         mutate(new = ifelse(is.na(new), 0, new)) %>%
         select(new) %>%
         t()
+    } else distribution1 <- t(rep(0,16)) # Otherwise just set to zero
 
     # Update data
-    doseOneGiven[i+1, ] <- round(distribution)
-    doseTwoGiven[i+1, ] <- alottedDose2
-    doseOneRemaining[i+1, ] <- doseOneRemaining[i, ] - doseOneGiven[i+1, ]
-    doseTwoRemaining[i+1, ] <- doseTwoRemaining[i, ] - doseTwoGiven[i+1, ]
-    dosesGiven[i, ] <- doseOneGiven[i + 1, ] + doseTwoGiven[i + 1, ]
-    dosesRemaining[i, ] <- doseOneRemaining[i + 1, ] + doseTwoRemaining[i + 1, ]
+    doseOneGiven[i, ] <- distribution1
+    doseTwoGiven[i, ] <- distribution2
+    doseOneRemaining[i, ] <- doseOneRemaining[i-1, ] - doseOneGiven[i, ]
+    doseTwoRemaining[i, ] <- doseTwoRemaining[i-1, ] - doseTwoGiven[i, ]
+    dosesGiven[i, ] <- doseOneGiven[i, ] + doseTwoGiven[i, ]
+    dosesRemaining[i, ] <- doseOneRemaining[i, ] + doseTwoRemaining[i, ]
 
     # increment i
     i <- i + 1
+    cat(i, "\n")
 }
 
     # tidy data
@@ -118,5 +140,39 @@ return(list(
 
 
 
+#'
+#'
+#' @param sc
+#' @param units
+#' @param units_eps
+#'
+check_results <- function(sc,units,gapEnd,gapStart,units_eps=10) {
+
+    with(sc,{
+        # check only vaccinate units per day
+        tmp <- dataOut %>%
+            group_by(t) %>%
+            summarise(n=sum(n),.groups="drop")
+        cat("1",all(tmp$n <= (units + units_eps)),"\n") # all
+        # check everyone is vaccinated twice
+        d1 <- doses %>% filter(dose == 1) %>% .$n %>% sum()
+        d2 <- doses %>% filter(dose == 2) %>% .$n %>% sum()
+        cat("2", all.equal(d1, d2), "\n")
+        # total given 2nd dose at t+gapEnd
+        tmp1 <- doses %>%
+            filter(dose == 1) %>%
+            group_by(t) %>%
+            summarise(n = sum(n),.groups="drop") %>%
+            summarise(n = cumsum(n),.groups="drop")
+        tmp2 <- doses %>%
+            filter(dose == 2) %>%
+            group_by(t) %>%
+            summarise(n = sum(n),.groups="drop") %>%
+            summarise(n = cumsum(n),.groups="drop")
+        N <- nrow(tmp2)
+        cat("3",all(tmp2$n[gapEnd:N] >= tmp2$n[1:(N-gapEnd+1)]),"\n")
+        cat("4",all(tmp2$n[gapStart:N] <= tmp1$n[1:(N-gapStart+1)]),"\n")
+    })
+}
 
 
