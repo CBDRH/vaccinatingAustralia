@@ -34,7 +34,6 @@ sc1 <- vaccinateAustralia(
         gapEnd = 6*7,
         hesitancy = hesitancy7
 )
-check_results(sc1,units=80000,gapEnd = 6*7,gapStart = 3*7)
 save(sc1, file = 'Outputs/sc1.rda')
 
 # Scenario 2
@@ -45,7 +44,6 @@ sc2 <- vaccinateAustralia(
     gapEnd = 6*7,
     hesitancy = hesitancy13
 )
-check_results(sc2,units=80000,gapEnd = 6*7,gapStart = 3*7)
 save(sc2, file = 'Outputs/sc2.rda')
 
 # Scenario 3
@@ -56,7 +54,6 @@ sc3 <- vaccinateAustralia(
     gapEnd = 12*7,
     hesitancy = hesitancy7
 )
-check_results(sc3,units=80000,gapEnd = 12*7,gapStart = 3*7)
 save(sc3, file = 'Outputs/sc3.rda')
 
 # Scenario 4
@@ -67,7 +64,6 @@ sc4 <- vaccinateAustralia(
     gapEnd = 12*7,
     hesitancy = hesitancy13
 )
-check_results(sc3,units=80000,gapEnd = 12*7,gapStart = 3*7)
 save(sc4, file = 'Outputs/sc4.rda')
 
 # Scenario 5
@@ -78,7 +74,6 @@ sc5 <- vaccinateAustralia(
     gapEnd = 6*7,
     hesitancy = hesitancy7
 )
-check_results(sc5,units=60000,gapEnd = 6*7,gapStart = 3*7)
 save(sc5, file = 'Outputs/sc5.rda')
 
 # Scenario 6
@@ -89,7 +84,6 @@ sc6 <- vaccinateAustralia(
     gapEnd = 6*7,
     hesitancy = hesitancy13
 )
-check_results(sc6,units=60000,gapEnd = 6*7,gapStart = 3*7)
 save(sc6, file = 'Outputs/sc6.rda')
 
 # Scenario 7
@@ -100,7 +94,6 @@ sc7 <- vaccinateAustralia(
     gapEnd = 12*7,
     hesitancy = hesitancy7
 )
-check_results(sc7,units=60000,gapEnd = 12*7,gapStart = 3*7)
 save(sc7, file = 'Outputs/sc7.rda')
 
 # Scenario 8
@@ -111,6 +104,15 @@ sc8 <- vaccinateAustralia(
     gapEnd = 12*7,
     hesitancy = hesitancy13
 )
-check_results(sc8,units=60000,gapEnd = 12*7,gapStart = 3*7)
 save(sc8, file = 'Outputs/sc8.rda')
 
+
+## Check results
+check_results(sc1, units = 80000, gapEnd = 6*7, gapStart = 3*7)
+check_results(sc2, units = 80000, gapEnd = 6*7, gapStart = 3*7)
+check_results(sc3, units = 80000, gapEnd = 12*7, gapStart = 3*7)
+check_results(sc4, units = 80000, gapEnd = 12*7, gapStart = 3*7)
+check_results(sc5, units = 60000, gapEnd = 6*7, gapStart = 3*7)
+check_results(sc6, units = 60000, gapEnd = 6*7, gapStart = 3*7)
+check_results(sc7, units = 60000, gapEnd = 12*7, gapStart = 3*7)
+check_results(sc8, units = 60000, gapEnd = 12*7, gapStart = 3*7)

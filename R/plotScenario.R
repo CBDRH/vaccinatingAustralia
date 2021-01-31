@@ -15,8 +15,6 @@ dates <- scenario$dataOut %>%
            phase = paste('Phase', phaseX))
 
 phases <- scenario$doses %>%
-    filter(t > 1) %>%
-    mutate(date = date-1) %>%
     group_by(date, dose) %>%
     summarise(n=sum(n), denom = sum(eligible)/2) %>%
     group_by(dose) %>%
