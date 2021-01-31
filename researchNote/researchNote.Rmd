@@ -166,7 +166,7 @@ Projection scenarios were based on a $2^k$ factorial design defined by three fac
 
 t2 <- data.frame(
   scenario = seq(1,8),
-  capacity = c(rep('80,000', 4), rep('60,000', 4)),
+  capacity = c(rep('80,000', 4), rep('170,000', 4)),
   gap = c(rep('3 to 6 weeks', 2), rep('3 to 12 weeks', 2), rep('3 to 6 weeks', 2), rep('3 to 12 weeks', 2)),
   hesitancy = c('7%', '13%', '7%', '13%', '7%', '13%', '7%', '13%')
 )
