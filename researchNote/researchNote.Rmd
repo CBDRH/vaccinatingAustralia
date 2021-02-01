@@ -236,7 +236,8 @@ t3 <- rbind(
         sumScenario(sc8)
         ) %>%
     mutate(scenario = row_number()) %>%
-    relocate("scenario")
+    relocate("scenario") %>%
+    mutate(across(starts_with("done"), ~format(dmy(as.character(.x)),"%d%b%y")))
 
 kbl(t3,
     format = 'latex',
