@@ -9,7 +9,7 @@ phase <- c('1a1', '1a2', '1a3', '1a4', '1b1', '1b2', '1b3', '1b4', '1b5', '1b6',
 
 
 # Set a fixed start date
-day1 <- as.Date("2021/02/15")
+day1 <- as.Date("2021/03/01")
 
 # Define two hesitancy vectors
 h7 <- 0.07
@@ -76,7 +76,7 @@ beepr::beep(7)
 
 # Scenario 5
 sc5 <- vaccinateAustralia(
-    units = 170000,
+    units = 180000,
     startDate = day1,
     gapStart = 3*7,
     gapEnd = 6*7,
@@ -88,7 +88,7 @@ beepr::beep(7)
 
 # Scenario 6
 sc6 <- vaccinateAustralia(
-    units = 170000,
+    units = 200000,
     startDate = day1,
     gapStart = 3*7,
     gapEnd = 6*7,
@@ -100,7 +100,7 @@ beepr::beep(7)
 
 # Scenario 7
 sc7 <- vaccinateAustralia(
-    units = 170000,
+    units = 200000,
     startDate = day1,
     gapStart = 3*7,
     gapEnd = 12*7,
@@ -112,7 +112,7 @@ beepr::beep(7)
 
 # Scenario 8
 sc8 <- vaccinateAustralia(
-    units = 170000,
+    units = 200000,
     startDate = day1,
     gapStart = 3*7,
     gapEnd = 12*7,
@@ -126,8 +126,8 @@ check_results(sc1, units = 80000, gapEnd = 6*7, gapStart = 3*7)
 check_results(sc2, units = 80000, gapEnd = 6*7, gapStart = 3*7)
 check_results(sc3, units = 80000, gapEnd = 12*7, gapStart = 3*7)
 check_results(sc4, units = 80000, gapEnd = 12*7, gapStart = 3*7)
-check_results(sc5, units = 170000, gapEnd = 6*7, gapStart = 3*7)
-check_results(sc6, units = 170000, gapEnd = 6*7, gapStart = 3*7)
-check_results(sc7, units = 170000, gapEnd = 12*7, gapStart = 3*7)
-check_results(sc8, units = 175000, gapEnd = 12*7, gapStart = 3*7)
+check_results(sc5, units = 200000, gapEnd = 6*7, gapStart = 3*7)
+check_results(sc6, units = 200000, gapEnd = 6*7, gapStart = 3*7)
+check_results(sc7, units = 200000, gapEnd = 12*7, gapStart = 3*7)
+check_results(sc8, units = 200000, gapEnd = 12*7, gapStart = 3*7)
 beepr::beep(8)
