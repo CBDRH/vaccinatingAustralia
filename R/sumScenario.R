@@ -12,8 +12,8 @@ sumScenario <- function(scenario){
 
     summary <- data.frame(
 
-        n1 = format(sum(scenario$dataOut$n), big.mark = ','),
-        n2 = format(sum(scenario$dataOut$n/2), big.mark = ','),
+        n1 = format(sum(scenario$dataOut$n)/1E6, nsmall = 1, digits = 3),
+        n2 = format(sum(scenario$dataOut$n/2)/1E6, nsmall = 1, digits = 3),
         pct = format(100*sum(scenario$dataOut$n/2)/sum(dist), nsmall = 1, digits=1),
         done1a = dates[[1, 2]],
         done1b = dates[[2, 2]],
