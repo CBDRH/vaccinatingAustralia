@@ -256,7 +256,7 @@ kbl(t3,
     linesep = '',
     label = 'projections', 
     align = c('lrrr'),
-    col.names = c("Scenario", "Number of vaccinations (millions)", "Individuals vaccinated (millions)", "Population coverage (%)",
+    col.names = c("Scenario", "Number of vaccine doses (millions)", "Individuals vaccinated (millions)", "Population coverage (%)",
                   "Phase 1a complete", "Phase 1b complete", "Phase 2a complete", "Phase 2b complete", "Phase 3 complete"),
     caption = "Summary of vaccine roll-out projections for different scenarios" ) %>%
   kable_styling(latex_options = c("hover", "striped", "HOLD_position"),
@@ -270,8 +270,8 @@ Under the less optimistic scenarios of 80,000 doses administered daily, it would
 
 ```{r cumlResults, fig.cap='Cumulative vaccine doses over time', fig.height=6.5, fig.width=6.5, fig.align='center'}
 
-fig1a <- plotScenario(sc5, 'A. Scenario 5 (200,000 units per day)')
-fig1b <- plotScenario(sc1, 'B. Scenario 1 (80,000 units per day)')
+fig1a <- plotScenario(sc5, 'A. Scenario 5 (200,000 doses per day)')
+fig1b <- plotScenario(sc1, 'B. Scenario 1 (80,000 doses per day)')
 
 ggpubr::ggarrange(fig1a, fig1b,
                   ncol = 1, 
