@@ -1,5 +1,6 @@
 ---
 title: 'Vaccinating Australia: How long will it take?'
+updated: "1st February, 2021"
 authors:
   - name: Mark Hanly
     department: Centre for Big Data Research in Health
@@ -8,8 +9,8 @@ authors:
     email: m.hanly@unsw.edu.au
   - name: Tim Churches
     department: Ingham Institute for Applied Medical Research
-    affiliation: South Western Sydney Clinical School, Faculty of Medicine, UNSW Sydney
-    location: Liverpool
+    affiliation: South Western Sydney Clinical School, Faculty of Medicine & Health, UNSW Sydney
+    location: Liverpool, Sydney 2070
     email: timothy.churches@unsw.edu.au
   - name: Oisín Fitzgerald
     department: Centre for Big Data Research in Health
@@ -31,9 +32,12 @@ abstract: |
 keywords:
   - COVID19
   - vaccination
-bibliography: references.bib
+bibliography: [packages.bib, references.bib]
 biblio-style: unsrt
 csl: jama.csl
+header-includes:
+  - \usepackage[british]{babel}
+  - \usepackage{gensymb}
 output: 
   rticles::arxiv_article:
     keep_tex: true
@@ -43,8 +47,10 @@ output:
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, error = FALSE, message = FALSE)
 
 # libraries
-library(dplyr)
+library(tidyverse)
+library(lubridate)
 library(kableExtra)
+library(ggrepel)
 
 # Source functions
 source('../R/sumScenario.R')
@@ -60,6 +66,10 @@ load('../Outputs/sc6.rda')
 load('../Outputs/sc7.rda')
 load('../Outputs/sc8.rda')
 load('../Outputs/sc9.rda')
+
+updated <- rmarkdown::metadata$updated[1]
+
+knitr::write_bib(.packages(), "packages.bib")
 ```
 
 \newpage
@@ -74,20 +84,20 @@ t0 <- data.frame(
   name = c('Pfizer/BioNTech', 'University of Oxford AstraZeneca', 'Novavax', 'COVAX Facility'),
   type = c('mRNA vaccine', 'Viral vector vaccine', 'Protein vaccine', 'Assorted'),
   doses = c('10', '54', '51', '25'), 
-  schedule = c('2 doses 21 days apart', '2 doses 28 days apart', '2 doses 21 days apart', 'Assorted'),
+  schedule = c('2 doses, 21 days apart', '2 doses, 28 days apart', '2 doses, 21 days apart', 'Assorted'),
   status = c('Provisionally approved by the TGA',
              'Phase 3 clinical trials',
-             'Phase 3 clinical trials', '9 candidate vaccines in various clinical trial stages')
+             'Phase 3 clinical trials', 'Nine candidate vaccines in various clinical trial stages')
 )
-  
+
 kbl(t0,
       format = 'latex',
       booktabs = TRUE,
       linesep = '',
       label = 'agreements', 
       align = c('llcll'),
-      col.names = c("Name", "Type", "Doses (millions)", 'Schedule', 'Status'),
-      caption = "Australia’s vaccine agreements") %>%
+      col.names = c("Name", "Type", "Doses (millions)", 'Schedule', paste("Status as at", updated)),
+      caption = "Vaccine supply agreements entered into by the Australian government") %>%
       kable_styling(latex_options = c("hover", "striped", "HOLD_position"),
                     position = "center") %>% 
       column_spec(1, width = '3cm') %>%
@@ -99,12 +109,12 @@ kbl(t0,
 
 ```
 
-The national roll-out strategy divides the population into 16 groups, organised into five distinct phases (Table \ref{tab:phases}). Hospital hubs with access to cold chain storage facilities will administer the Pfizer/BioNTech vaccine to the highest priority groups scheduled in Phase 1a, which includes border workers, frontline healthcare staff, and aged care staff and residents. Pending approval, the Astra Zeneca vaccine would be administered to the bulk of the population through a network of GPs and pharmacies. The Prime Minister Scott Morrison has quoted a target of 80,000 vaccinations per day, [@pm2021] however a back of the envelope calculation would suggest that at this rate it would take some 500 days to vaccinate 20 million adult Australians twice, placing the finish line somewhere around the middle of 2022. To reach the October target would take closer to 160,000 daily vaccinations. 
+The national roll-out strategy divides the population into 16 groups, organised into five distinct phases (Table \ref{tab:phases}). Hospital hubs with access to -70\degree C ultra-cold-chain storage facilities will administer the Pfizer/BioNTech vaccine to the highest priority groups scheduled in Phase 1a, which includes border workers, frontline healthcare staff, and aged care staff and residents. Pending approval, the AstraZeneca vaccine would be administered to the bulk of the adult population through a network of general practitioners (GPs) and pharmacies. The Australian Prime Minister has quoted a target of 80,000 vaccinations per day [@pm2021]. However, some simple "back of the envelope" calculations suggest that at that rate, it would take approximately 500 days administer the vaccines to 20 million adult Australians twice, placing the completion date somewhere in the second half of 2022. This may not correspond to public and business expectations. Clearly a considerably more ambitious target is neccessary to reach the October 2021 completion date. 
+
+The Pfizer/BioNTech and AstraZeneca vaccines both require two doses---a primer and a booster---which need to be delivered within a specified time frame after the initial shot. This complicates rollout as the resources of specialised vaccine administration facilities,  and nominated general practices and pharmacies must be divided between unprotected individuals waiting for their first injection and those who have already been afforded some protection and who are returning for their booster administration. Furthermore, the duration of protection afforded by these vaccines is not yet well characterised, and re-vaccination of some or all of the population may be required. We have not included re-vaccination into the any of the scenarios examined in this paper, at this stage.
 
 When it comes to vaccine roll-out, speed is of the essence. Statistical modelling has illustrated that epidemic duration, cases and deaths are minimised dramatically as the number of available daily vaccinations increases. For example, increasing the daily capacity by 25% from 75,000 to 100,000 would see a 60% reduction in total cases and deaths.[@macintyre2020modelling] 
 
-
-An added complication is that the Pfizer/BioNTech and AstraZeneca vaccines both require two doses---a primer and a booster---which need to be delivered within a specified time frame after the initial shot. This complicates roll-out as the daily resources of both vaccine units and healthcare staff must be divided between those waiting for their first jab and those returning for their booster.    
 
 ```{r}
 t1 <- data.frame(
@@ -144,25 +154,26 @@ kbl(t1,
       add_footnote('Adapted from https://www.health.gov.au/sites/default/files/documents/2021/01/australia-s-covid-19-vaccine-national-roll-out-strategy.pdf', notation = 'none', threeparttable = TRUE)
 ```
 
-Another unknown is the question of vaccine hesitancy, which refers to the delay in acceptance or refusal to take a vaccine despite one being available. [@macdonald2015vaccine] Clearly, high levels of vaccine hesitancy would have the potential to undermine efforts to vaccinate the population. An online survey of over 3,000 Australian adults undertaken in August 2020 asked respondents if they would take a safe and effective vaccine for COVID-19, if one was developed. The population-weighted responses were 5.5% "definitely not", 7.2% "probably not", 28.7% "probably" and 58.5% "definitely". [@edwards2020covid] This suggests relatively low levels of vaccine hesitancy, however this could still be problematic. At the time of writing it seems likely that the bulk of the Australian population will receive the Astra Zeneca vaccine, which has recorded an average efficacy of 70% across clinical trial arms.[@voysey2020safety] At this level, it would be necessary to immunise 86% of the entire population to achieve herd immunity.[@macintyre2020modelling]  
+Another unknown is the question of vaccine hesitancy, which refers to delay in acceptance or complete refusal of vaccination, despite a suitable vaccine being available and accessible. [@macdonald2015vaccine] Clearly, high levels of vaccine hesitancy would have the potential to undermine efforts to establish adequate protection of the whole population through herd immunity. An online survey of over 3,000 Australian adults undertaken in August 2020 asked respondents if they would agree to vaccination for COVID-19 if a safe and effective vaccine were available. The population-weighted responses were 5.5% _definitely not_, 7.2% _probably not_, 28.7% _probably yes_ and 58.5% _definitely yes_. [@edwards2020covid] 
 
-The aim of this analysis is to estimate how long it will take to distribute the two-dose COVID-19 vaccine schedule to the Australian population. We consider a variety of scenarios based on the daily vaccine capacity, the time frame between the first and second dose and the scale of vaccine hesitancy in the population. We conclude by comparing daily vaccination rates from countries where vaccination programs are already underway. 
+The aim of this analysis is to estimate how long it might take to administer the announced two-dose COVID-19 vaccine schedule to the Australian population. We consider a variety of scenarios based on the daily vaccine administration capacities, the timeframe between the first and second doses and the scale of vaccine hesitancy in the population. We conclude by comparing daily vaccine administration rates from countries where vaccination programs are already underway. 
+
 
 # Methods
 
 ## Population and priority groups
-Our analysis was based on the 16 priority groups and five phases proposed by the Australian government (see Table \ref{tab:phases}). Th implied population size is 25.7 million people, including 5.67 million children and adolescents under the age of 18. We assumed that equal priority was given to all groups within the same phase.
+Our analysis is based on the 16 priority groups and five phases proposed by the Australian government (see Table \ref{tab:phases}). The assumed population size is 25.7 million people, including 5.67 million children and adolescents under the age of 18. We also assume that equal priority will be given to all groups within the same phase.
 
 ## Vaccine roll out projections
-Roll out projections were based on four parameters: 
+Roll out projections are based on four parameters: 
 
 1. The daily vaccination capacity. 
-2. The minimum number of days between the first dose and the second dose.
-3. The maximum number of days between the first dose and the second dose.
-4. Vaccine hesitancy
+1. The minimum number of days between the first dose and the second dose.
+1. The maximum number of days between the first dose and the second dose.
+1. Vaccine hesitancy
 
 ## Projection scenarios
-Projection scenarios were based on a $2^k$ factorial design defined by three factors with two levels each. The scenarios are summarised in Table \ref{tab:scenarios} and the three factors and levels are detailed below: 
+Projection scenarios arebased on a $2^k$ factorial design defined by three factors with two levels each. The scenarios are summarised in Table \ref{tab:scenarios} and the three factors and levels are detailed below: 
 
 * Daily vaccination capacity (80,000 versus 170,000) 
 
@@ -186,7 +197,7 @@ kbl(t2,
       linesep = '',
       label = 'scenarios', 
       align = c('lrrr'),
-      col.names = c("Scenario", "Capacity (units per day)", "Gap between doses", "Hesitancy"),
+      col.names = c("Scenario", "Capacity (doses per day)", "Gap between doses", "Hesitancy"),
       caption = "Projection scenarios" ) %>%
       kable_styling(latex_options = c("hover", "striped", "HOLD_position"),
                     full_width = TRUE,
@@ -195,34 +206,33 @@ kbl(t2,
 
 ```
 
-The projections assumed that those who were hesitant would never receive the vaccine. The range of hesitancy rates were based on the survey data reported by Edwards et al [@edwards2020covid], and only applied to general population groups. Border staff, healthcare and aged care workers, aged care residents and adults with a medical condition were assumed to have 0% vaccine hesitancy. 
+The projections assume that those who are hesitant will never receive the vaccine. The range of hesitancy rates are based on the survey data reported by Edwards _et al._ [@edwards2020covid], and are only applied to general population groups. Border staff, healthcare and aged care workers, aged care residents and adults with a medical condition were assumed to have negligible vaccine hesitancy. 
 
 ## Vaccine allocation
 We allocated the daily available vaccination doses according to the following algorithm: 
 
-1. Calculate the number of second doses due, based on the specified permissible range for the second dose. As an example, if the second dose is is specified to be administered between 3 and 6 weeks, then the booster shots for people vaccinated on day 1 would be evenly distributed across the three weeks between day 22 and day 42).
+1. Calculate the number of second doses due, based on the specified permissible range for the second dose. As an example, if the second dose is specified to be administered at between three and six weeks, then the booster doses for people vaccinated on day 1 would be evenly distributed across the three weeks between day 22 and day 42).
 
-2. Assign the remaining doses from the daily limit to those awaiting their first dose.
+1. Assign the remaining doses from the daily limit to those awaiting their first dose.
 
-3. Identify the highest priority phase that haven't received all first doses.
+1. Identify the highest priority phase that hasn't yet received all first doses.
 
-4. Divide the available first doses between the subgroups in the highest priority phase, proportional to the number of unvaccinated individuals remaining in each subgroup. 
+1. Divide the available first doses between the subgroups in the highest priority phase, proportional to the number of unvaccinated individuals remaining in each subgroup. 
 
-5. Stop when all population members, minus those who are hesitant, have been vaccinated twice. 
+1. Stop when all population members, minus those who are hesitant, have been vaccinated twice. 
 
 ## Software and code
 
-The analysis was performed using R version 4.0.3. The source code can be accessed at https://github.com/CBDRH/vaccinatingAustralia. 
 
-
-
+The analysis was performed using R version 4.0.3 and associated packages[@R-base, @tidyverse2019]. The source code can be accessed at https://github.com/CBDRH/vaccinatingAustralia. 
 
 
 # Results
 
 Results from the eight scenarios are presented in Table \ref{tab:scenarios}. Scenarios that assumed a vaccine hesitancy of 7% among the general population resulted in 48.3 million vaccine doses administered to 24.2 million people, corresponding to a population coverage of 94.0%. Scenarios that assumed the vaccine higher hesitancy rate of 13% resulted in 45.7 million vaccine doses administered to 22.9 million people for a coverage of 88.9%.
 
-Under an most optimistic Scenario of 200,000 daily doses with the 7% hesitancy rate (Scenario 5), assuming a start date of 1 March, Phase 1a would be fully vaccinated (i.e. primer and booster doses administered) as early as 13 April---just six weeks. The entire adult population would be fully vaccinated by 25 October---in line with government targets---and a further eight weeks would see the entire population include those under 18 vaccinated. Under this optimistic scenario, the vulnerable groups in Phase 2a, including adults aged 70 and above and those with underlying medical conditions, would be fully vaccinated before the onset of the colder winter months. Under this scenario, we would reach 50% population coverage in late July and 75% population Around the start of October (Figure \ref{fig:cumlResults}A).
+Under an optimistic Scenario of 200,000 daily doses with the 7% hesitancy rate (Scenario 5), assuming a start date of 1 March, Phase 1a would be fully vaccinated (i.e. primer and booster doses administered) as early as 13 April---in just six elapsed weeks. The entire adult population would be fully vaccinated by 25 October---in line with government targets---and a further eight weeks would see the entire population include those under 18 vaccinated. Under this optimistic scenario, the vulnerable groups in Phase 2a, including adults aged 70 and above and those with underlying medical conditions, would be fully vaccinated before the onset of the Southern Hemisphere winter. Under this scenario, we would reach 50% population coverage in late July and 75% population Around the start of October (Figure \ref{fig:cumlResults}A).
+
 
 ```{r}
 
@@ -237,7 +247,8 @@ t3 <- rbind(
         sumScenario(sc8)
         ) %>%
     mutate(scenario = row_number()) %>%
-    relocate("scenario")
+    relocate("scenario") %>%
+    mutate(across(starts_with("done"), ~format(dmy(as.character(.x)),"%d%b%y")))
 
 kbl(t3,
     format = 'latex',
@@ -271,11 +282,18 @@ ggpubr::ggarrange(fig1a, fig1b,
 
 # Discussion
 
-To meet the target of vaccinating all amenable adult Australians by the end of October 2021 there will need to be in the order of 200,000 doses delivered daily on average---a truly furious pace. 
+To meet the target of vaccinating all adult Australians by the end of October 2021 there will need to be, on average, in the order of 200,000 doses delivered daily (including weekends and holidays)--a truly furious pace. 
 
-To put bounds on the feasibility of this target, a potentially illuminating exercise is to compare to the vaccination rates achieved by other countries who have already begun to roll out their vaccination programs (Figure \ref{fig:dailyVac}. The stand out leader is Israel, where between 7,000 and 20,000 vaccinations per million population have been delivered daily through out January. Several factors have contributed to this success, including a young, centralised population and a strong public health infrastructure. Perhaps most important has been strong logistical planning, including coordination of delivery, cold-chain storage and staffing.[@mckee2021can] Other countries have been less successful in their roll-out, including the United States (4,000 per million pop), the United Kingdom (5,000 per million pop) and the European Union (1,100 per million pop).  
+To test the feasibility of such a vaccination administration rate, it is illuminating to consider the COVID-19 vaccination rates currently being reported by other countries which have already begun to roll out their vaccination programs (Figure \ref{fig:dailyVac}. The outlier is Israel, where between 7,000 and 20,000 vaccinations per million population have been delivered daily throughout January. Several factors may have contributed to this success, including a young, largely urbanised population and a strong public health infrastructure. Perhaps most important has been strong logistical planning, including coordination of delivery, ultra-cold-chain storage and staffing.[@mckee2021can] Other countries have been less successful in their rollout, including the United States (4,000 per million pop), the United Kingdom (5,000 per million pop) and the European Union (1,100 per million pop).  
 
- With a population of 25.7 million in Australia, the figure of 200,000 doses per day from our projections corresponds to around 7,800 daily doses per million population. It will be possible to vaccinate the Australian population in just eight months but we will need to do considerably better than the rates currently being achieved in most countries. Completing vaccination roll-out this year is possible, but it will require dedicated large-scale vaccination sites that are capable of delivering thousands of doses a day as well as the enthusiastic participation of GP practices and community pharmacies around the country. We need to start now, get up to speed quickly and maintain that pace. The recent invitation extended to community pharmacies to participate in the vaccination roll-out is a welcome development. There are some 5,800 community pharmacies across Australia; if each could vaccinate 20 community members a day that would represent half of the target of 200,000 daily doses to cross the finish line for community vaccination by the end of October.
+With a population of 25.7 million in Australia, the figure of 200,000 doses per day from our projections corresponds to around 7,800 daily doses per million population. Thus, it seems possible to vaccinate the Australian population in just nine months but administration rates considerably better than those currently being achieved in most countries will be needed. Clearly Australia needs to start as soon as possible, to rapidly ramp-up to the required vaccination velocity and then to maintain that pace. 
+
+Apart from Phase 1a, currently announced delivery plans involve recruiting, authorising and training 1,000 general practices and an unknown number of pharmacies to administer vaccine doses, as well as capture and record the required documentation for each vaccinee [ref]. 
+
+If these authorised general practices alone are relied upon, then on average each practice would need to administer 170 doses per day, seven days per week, for about six months. This seems infeasible for all but the largest group practices. There are some 5,800 community pharmacies across Australia [ref]. If we assume that half of these are willing and able to participate in the vaccination programme, and each delivers an average of 30 doses per day (inlcuding weekends and holidays), then this would represent half of the daily administration capacity of 170,000 doses per day to meet the whole of community vaccination target of the end of October 2021. However, that still means that the 1,000 authorised general practices would need to administer an average of 70 doses per day. This would still seem to be a stretch.
+
+Of course, there are also major logistical challenges in ramping up such a vaccination capacity. Setting up supply chain and vaccine delivery information systems is likely to take sveral weeks at the most optimistic, and adequately training several clinical and clerical staff from each of the authorised vaccination general practices and pharmacies to safely screen vaccinees, deliver the vaccines and record the results is likely to take much longer than one month. Thus our assumption of commencement of vaccine roll-out at full velocity  by March 2021 seems partcilarly optimistic, and the estimates reported in the tables are likely to be equally optimistic.
+
 
 ```{r dailyVac, fig.align='center', fig.cap='Daily COVID-19 vaccines administered per one million population', fig.subcap='(source: ourworldindata.org'}
 
@@ -283,16 +301,17 @@ To put bounds on the feasibility of this target, a potentially illuminating exer
 dailyVac <- readr::read_csv('https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/vaccinations/vaccinations.csv')
 
 dv1 <- dailyVac %>% filter(location %in% c('United States',
-                                           'United Kingdom',
-                                           'European Union',
-                                           'Canada',
-                                           'Israel')) %>% 
-    filter(date >= as.Date("2021/01/01")) 
-
-dv1Lab <- dv1 %>% 
-            group_by(location) %>% 
-            summarise(date = max(date),
-                      y = last(daily_vaccinations_per_million), .groups = NULL)
+                                    'United Kingdom',
+                                    'European Union',
+                                    'Serbia',
+                                    'Canada',
+                                    'Israel')) %>% 
+                    filter(date >= as.Date("2021/01/01")) %>%
+                    group_by(location) %>%
+                    mutate(label = if_else(date == max(date),
+                                           as.character(location), 
+                                           NA_character_)) %>%
+                    ungroup()
 
 ggplot(dv1, 
        aes(x = date, 
@@ -301,15 +320,18 @@ ggplot(dv1,
            color = location,
            label = location)) +
     geom_line(size = 1.2) +
-    geom_label(data = dv1Lab, aes(x = date, y = y, group = location, label = location), 
-               size = 2, nudge_x = 2) +
+    geom_label_repel(aes(label = label),
+                  direction = "y", hjust = "left",
+                  nudge_x = 3,
+                  na.rm = TRUE) + 
     scale_y_continuous(name = 'Daily vaccinations per milliom', 
                        labels = scales::comma_format()) +
     scale_x_date(name = 'Date', date_labels = '%d %b',
                  breaks = 'week',
-                 limits = c(as.Date('2021/01/01'), as.Date('2021/02/10'))) +
-    theme_dark() + 
-    theme(legend.position = 'none')
+                 limits = c(as.Date('2021/01/01'), today()  + period(1, "weeks"))) +
+    scale_color_discrete(name = 'Country') +
+    theme_dark() +
+    theme(legend.position = "none") +
     labs(caption = "Data source: ourworldindata.org")
 
     
