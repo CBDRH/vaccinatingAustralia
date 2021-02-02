@@ -331,6 +331,10 @@ ggplot(dv1,
     
 ```
 
+# Contributions
+
+MH, TC and LJ conceived of the study; MH, OF and TC wrote the R code; MH drafted the manuscript; all authors reviewed and edited the manuscript.
+
 # Acknowledgements
 
 This research was supported by the generous assistance of Ian Sharp, philanthropic supporter of UNSW research, and by a research seed grant provided by the Sydney Partnership for Health, Education, Research and Enterprise (SPHERE) Infectious diseases, Immunity and Inflammation (Triple-I) Clinical Academic Group.
