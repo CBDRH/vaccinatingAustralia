@@ -23,7 +23,7 @@ authors:
     affiliation: UNSW Sydney
     email: l.jorm@unsw.edu.au
 abstract: |
-  The Australian Government's COVID-19 vaccine national rollout strategy is scheduled to commence in late February and aims to vaccinate the adult community by the end of October. The task of vaccinating some 20 million adult Australians within this timeframe presents considerable logistical challenges. Key to reaching this target is the rate of vaccine delivery: the number of vaccine doses that can be administered per day. In the opening phase, high priority groups will receive the Pfizer/BioNTech vaccine through hospital hubs at an initial rate of 80,000 doses per week. However, pending regulatory approval, the current plan appears to be to distribute the Astra Zeneca vaccine to the bulk of the popluation through a combination of general practices and community pharmacies. Here, we run a series of projections to estimate how long it will take to vaccinate the Australian population under different assumptions about the rate of vaccination as well as the schedule for second doses and prevalence of vaccine hesitancy. Our analysis highlights the ambitious rate of vaccine administration that will be neccessary to meet the Government's target completion date of October 2021. A rate of 200,000 doses per day would comfortably meet the target; 80,000 doses a day would see roll-out extended until mid-2022. Speed is of the essence when it comes to vaccine rollout: protecting the population quickly will minimise the risk of sporadic and costly lockdowns lockdowns and the potential for a small local cluster getting out of control and sparking a new epidemic wave. The government should gather all its resources to maximise the daily vaccination rate, ideally aiming to administer 200,000 doses per day. Quickly achieving and maintaining this pace will require dedicated large-scale vaccination sites that are capable of delivering thousands of doses a week in addition to the enthusiastic participation of GP practices and community pharmacies around the country. Lessons on the neccessary logistical planning, including coordination of delivery, ultra-cold-chain storage and staffing, can potentially be learned from Israel, where between 7,000 and 20,000 vaccinations per million population have been delivered daily throughout January. 
+  The Australian Government's COVID-19 vaccine national rollout strategy is scheduled to commence in late February 2021 and aims to vaccinate the adult community by the end of October 2021. The task of vaccinating some 20 million adult Australians within this timeframe presents considerable logistical challenges. Key to reaching this target is the rate of vaccine delivery: the number of vaccine doses that can be administered per day. In the opening phase, high priority groups will receive the Pfizer/BioNTech vaccine through hospital hubs at an initial rate of 80,000 doses per week. However, pending regulatory approval, the current plan appears to be to distribute the AstraZeneca vaccine to the bulk of the popluation through a combination of general practices and community pharmacies. Here, we run a series of projections to estimate how long it will take to vaccinate the Australian population under different assumptions about the rate of vaccine administration as well as the schedule for second doses and prevalence of vaccine hesitancy. Our analysis highlights the ambitious rate of vaccine administration that will be neccessary to meet the Australian Government completion target of October 2021. A rate of 200,000 doses per day would comfortably meet that target; 80,000 doses a day would see roll-out extended until mid-2022. Speed is of the essence when it comes to vaccine rollout: protecting the population quickly will minimise the risk of sporadic and costly lockdowns lockdowns and the potential for a small local cluster getting out of control and sparking a new epidemic wave. The government should gather all its resources to maximise the daily vaccination rate, ideally aiming to ramp up administration to 200,000 doses per day as quickly as possible. Quickly achieving and maintaining this pace will require dedicated large-scale vaccination sites that are capable of delivering thousands of doses a week in addition to the enthusiastic participation of GP practices and community pharmacies around the country. Lessons on the neccessary logistical planning, including coordination of delivery, ultra-cold-chain storage and staffing, can potentially be learned from Israel, where between 7,000 and 20,000 vaccinations per million population have been delivered daily throughout January. 
   
 keywords:
   - COVID19
@@ -242,21 +242,23 @@ t3 <- rbind(
         ) %>%
     mutate(scenario = row_number()) %>%
     relocate("scenario") %>%
-    mutate(across(starts_with("done"), ~format(dmy(as.character(.x)),"%d%b%y")))
+    mutate(across(starts_with("done"), 
+                  ~format(dmy(as.character(.x)),"%b%Y")))
 
 kbl(t3,
     format = 'latex',
     booktabs = TRUE,
     linesep = '',
     label = 'projections', 
-    align = c('lrrr'),
+    align = c('lrrrlllll'),
     col.names = c("Scenario", "Number of vaccine doses (millions)", "Individuals vaccinated (millions)", "Population coverage (%)",
                   "Phase 1a complete", "Phase 1b complete", "Phase 2a complete", "Phase 2b complete", "Phase 3 complete"),
     caption = "Summary of vaccine roll-out projections for different scenarios" ) %>%
   kable_styling(latex_options = c("hover", "striped", "HOLD_position"),
                 full_width = TRUE,
                 position = "center") %>%
-  column_spec(1, bold = T) 
+  column_spec(1, bold = T) # %>%
+  # column_spec(5:9,  latex_column_spec = ">{\\\\footnotesize}c")
 
 ```
 
