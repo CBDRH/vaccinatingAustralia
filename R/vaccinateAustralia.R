@@ -1,12 +1,15 @@
 # Function to calculate time to vaccinate given daily units, second dose scheduling dates and proportion hesitant
 
-vaccinateAustralia <- function(units, startDate, gapStart, gapEnd, hesitancy){
+vaccinateAustralia <- function(unitsMax, startDate, gapStart, gapEnd, hesitancy){
+
+# Define run-in period (will fix this at 6 weeks)
+runIn <- 42
 
 # Define hesitant proportion
 hesitant <- setNames(as.data.frame(t(hesitancy * dist)), phase)
 
 # Doses administered on day 1 (all go to phase1 priority)
-doseOneGiven <- setNames(as.data.frame(t(c(units*dist[1:4]/sum(dist[1:4]), rep(0,12)))), phase)
+doseOneGiven <- setNames(as.data.frame(t(c(unitsMax/runIn*dist[1:4]/sum(dist[1:4]), rep(0,12)))), phase)
 doseTwoGiven <- setNames(as.data.frame(t(rep(0,16))), phase)
 
 # Doses left to be done on day 1
@@ -18,6 +21,9 @@ dosesRemaining <- doseOneRemaining + doseTwoRemaining
 
 i <- 2 # DAy one is distributed above so start from day 2
 while (any(floor(doseTwoRemaining[i-1, ]) > 1)) {
+
+    units <- ifelse(i <= runIn, i*unitsMax/runIn, unitsMax)
+
      # Lower and upper bounds for lookback period
     lower <- ifelse(i <= gapStart, 1, max(1, i - gapEnd + 1))
     upper <- ifelse(i <= gapStart, 1, max(1, i - gapStart))
