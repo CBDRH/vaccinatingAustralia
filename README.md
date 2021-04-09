@@ -6,7 +6,7 @@ The Australian Government's COVID-19 vaccine rollout strategy is scheduled to co
 ## Links
 * View and download the latest version of the paper from [medRxiv](https://doi.org/10.1101/2021.02.02.21250979)
 * Download the paper from [GitHub](https://github.com/CBDRH/vaccinatingAustralia/raw/main/researchNote/researchNote.pdf) 
-* Article in [The Conversation](https://theconversation.com/drafts/154476) 
+* Article in [The Conversation](https://theconversation.com/australia-must-vaccinate-200-000-adults-a-day-to-meet-october-target-new-modelling-154476) 
 * Public data on the rate of daily vaccinations from [ourworldindata.org](https://github.com/owid/covid-19-data/tree/master/public/data/vaccinations)
 
 ## Suggested citation
