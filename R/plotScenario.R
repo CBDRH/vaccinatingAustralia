@@ -28,13 +28,13 @@ phases <- scenario$doses %>%
 p <- ggplot() +
     geom_rect(data = dates,
               aes(xmin = x1, xmax = x2, ymin = y1, ymax = y2),
-              fill = brewer.pal(9, 'Blues')[1:5]) +
+              fill = 'grey40') +
     geom_text(data=dates,
               aes(x = x1, y = y1, label = phase), # phaseX
               size = 4,
               nudge_x = -50,
               nudge_y = .05,
-              color = brewer.pal(9, 'Blues')[1:5]) +
+              color = 'grey40') +
     geom_bar(data = phases,
              aes(x = date, y = cumlPct/2, group = schedule, fill = schedule),
              stat = 'identity', position = 'stack', width = 2) +
@@ -45,11 +45,10 @@ p <- ggplot() +
                  minor_breaks = 'month',
                  limits = c(as.Date('2021/01/01'), as.Date('2022/12/31'))) +
     scale_fill_manual(name=NULL,
-                      values = c("First dose" = brewer.pal(9, 'YlOrRd')[1],
-                                 "Second dose"= brewer.pal(9, 'YlOrRd')[3]),
+                      values = c("First dose" = '#fc8d59',
+                                 "Second dose"= '#91bfdb'),
                       guide =  guide_legend(reverse = TRUE)) +
-    labs(subtitle = title) +
-    theme_dark()
+    labs(subtitle = title)
 
 return(p)
 }
