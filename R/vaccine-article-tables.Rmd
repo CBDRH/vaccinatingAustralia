@@ -1,0 +1,234 @@
+---
+title: "Vaccinating Australia: How long will it take?"
+subtitle: "Revised-tables"
+author: "Mark Hanly"
+date: "07/06/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+library(dplyr)
+library(kableExtra)
+library(tidyr)
+load(paste(here::here('Submission/Vaccine/2 - Revision 1/'), lubridate::today(), '-dfDatesTable.Rda'))
+
+```
+
+# Table 1 
+
+```{r}
+
+t0 <- data.frame(
+  name = c('Pfizer/BioNTech', 'University of Oxford AstraZeneca', 'Moderna', 'Novavax', 'COVAX Facility'),
+  type = c('mRNA vaccine', 'Viral vector vaccine', 'mRNA-based vaccine', 'Protein vaccine', 'Assorted'),
+  doses = c('40', '53.8', '25', '51', '25'), 
+  schedule = c('2 doses, 21 days apart', '2 doses, 84 days apart', '2 doses, 28 days apart', '2 doses, 21 days apart', 'Assorted'),
+  status = c('Provisionally approved by the Therapeutic Goods Administration for individuals 16 years and older.',
+             'Provisionally approved by the Therapeutic Goods Administration for individuals 18 years and older. The Pfizer vaccine is recommended for individuals aged 50 years and over but the AstraZeneca vaccine can still be given to adults under 50 years if the benefit of vaccination is likely to outweigh risk, and where informed consent has been obtained.',
+             'Phase 3 clinical trials; An application by Moderna to the TGA is anticipated.',
+             'Undergoing TGA evaluation.',
+             'Nine candidate vaccines in various clinical trial stages.')
+)
+
+kbl(t0,
+      format = 'html',
+      booktabs = TRUE,
+      linesep = '',
+      label = 'agreements', 
+      align = c('llcll'),
+      col.names = c("Name", "Type", "Doses (millions)", 'Schedule', "Status as at 01 June 2021"),
+      caption = "Vaccine supply agreements entered into by the Australian government") %>%
+      kable_styling(bootstrap_options = c("hover", "striped", "HOLD_position"),
+                    position = "center") %>% 
+      column_spec(1, width = '2cm') %>%
+      column_spec(2, width = '2cm') %>%
+      column_spec(3, width = '2cm') %>%
+      column_spec(4, width = '2cm') %>%
+      column_spec(5, width = '6cm') %>%
+      add_footnote('Adapted from https://www.health.gov.au/initiatives-and-programs/covid-19-vaccines/about-covid-19-vaccines/australias-vaccine-agreements', notation = 'none', threeparttable = TRUE)
+
+```
+
+
+# Table 2
+
+```{r}
+t1 <- data.frame(
+        phase = c('1a', '1a', '1a', '1a', '1b', '1b', '1b', '1b', '1b', '1b', '2a', '2a', '2a', '2a', '2b', '3'),
+        desc = c('Quarantine & border workers',
+                    'Frontline health care workers',
+                    'Aged care and disability care staff',
+                    'Aged care and disability care residents',
+                    'Elderly adults aged 80 years and over',
+                    'Elderly adults aged 70-79 years',
+                    'Other health care workers',
+                    'Aboriginal and Torres Strait Islander people aged 55 years and over',
+                    'Younger adults with an underlying medical condition',
+                    'Critical and high risk workers',
+                    'Adults aged 60-69',
+                    'Adults aged 50-59',
+                    'Aboriginal and Torres Strait Islander people aged 18-54',
+                    'Other critical and high risk workers',
+                    'Balance of adult population',
+                    '<18 if recommended'),
+                size = format(c(70000, 100000, 318000, 190000, 1045000, 1858000, 953000, 87000, 2000000, 196000, 2650000, 3080000, 387000, 453000, 6643000, 5670000), big.mark = ','))
+
+kbl(t1,
+      format = 'html',
+      booktabs = TRUE,
+      linesep = '',
+      label = 'phases', 
+      align = c('llr'),
+      col.names = c("Phase", "Description", "Size"),
+      caption = "Australia’s COVID-19 vaccine national roll-out strategy") %>%
+      kable_styling(bootstrap_options = c("hover", "striped", "HOLD_position"),
+                    full_width = FALSE,
+                    position = "center") %>% 
+      column_spec(1, bold = T, width = '1cm') %>%
+      column_spec(2, width = '11cm') %>% 
+      column_spec(3, width = '2cm') %>% 
+      add_footnote('Adapted from https://www.health.gov.au/sites/default/files/documents/2021/01/australia-s-covid-19-vaccine-national-roll-out-strategy.pdf', notation = 'none', threeparttable = TRUE)
+```
+
+
+
+# Table 3
+
+```{r}
+dfHesitancy <- tibble(
+    scenario = factor(rep(c(1, 2), each = 20), labels = list('1' = 'Less hesitant', '2' = 'More hesitant')),
+    phase = rep(rep(c('1a', '1b', '2a', '2b', '3'), each = 4), 2),
+    category = factor(rep(c(1:4), 10), labels = list('1' = 'Definitely will',
+                                                     '2' = 'Probably will',
+                                                     '3' = 'Probably won\'t',
+                                                     '4' = 'Definitely won\'t')),
+    hp = c(c(90, 10, 0, 0), rep(c(60, 28, 07, 5), 4), c(90, 10, 0, 0, 43, 36, 13, 8, 30, 40, 20, 10), rep(c(43, 36, 13, 8), 2))
+) %>% 
+    pivot_wider(id_cols = c(scenario, phase), names_from = category, values_from = hp)
+
+
+kbl(dfHesitancy,
+      format = 'html',
+      booktabs = TRUE,
+      linesep = '',
+      label = 'hesitancy', 
+      align = c('llcccc'),
+      col.names = c("Scenario", "Phase", "Definitely will", "Probably will", "Probably won't", "Definitely won't"),
+      caption = "Projection scenarios" ) %>%
+      kable_styling(bootstrap_options = c("hover", "striped", "HOLD_position"),
+                    full_width = TRUE,
+                    position = "center") %>% 
+    column_spec(1, width = '4cm') %>%
+    column_spec(2, width = '4cm') %>% 
+    column_spec(3, width = '3cm') %>% 
+    column_spec(4, width = '3cm') %>% 
+    column_spec(5, width = '3cm') %>%
+    column_spec(6, width = '3cm') %>%
+    add_header_above(c(" " = 2, "Attitude towards receiving the vaccine" = 4))
+
+```
+
+
+
+# Table 3
+
+```{r}
+t2 <-
+    data.frame(
+        scenario = c(1:8),
+        capacity = rep(c('80,000', '200,000'), each = 4),
+        opening = rep(rep(c('Earlier opening', 'Later opening'), each = 2), 2),
+        hesitancy = rep(c('Less hesitant', 'More hesitant'), 4)
+    )
+
+kbl(t2,
+      format = 'html',
+      booktabs = TRUE,
+      linesep = '',
+      label = 'scenarios', 
+      align = c('lrrr'),
+      col.names = c("Scenario", "Capacity (doses per day)", "Opening schedule", "Hesitancy"),
+      caption = "Projection scenarios" ) %>%
+      kable_styling(bootstrap_options = c("hover", "striped", "HOLD_position"),
+                    full_width = TRUE,
+                    position = "center") %>% 
+      column_spec(1, bold = T)
+
+
+```
+
+# Table 4 
+
+```{r}
+#### Table of key dates by phase
+#### Need to first run vaccine-article-projections-and-figures.R
+
+dfDatesTable %>%
+    select(c(scenario, phase, end)) %>%
+    mutate(end = format(end, '%b %Y')) %>%
+    pivot_wider(id_cols = c(scenario),
+                names_from = phase,
+                values_from = end) %>%
+    kbl(format = 'html',
+        booktabs = TRUE,
+        linesep = '',
+        label = 'projections',
+        align = c('lrrrrr'),
+        col.names = c("Scenario", "Phase 1a", "Phase 1b", "Phase 2a", "Phase 2b", "Phase 3"),
+        caption = "Summary of vaccine roll-out projections for different scenarios" ) %>%
+    kable_styling(bootstrap_options = c("hover", "striped", "HOLD_position"),
+                  full_width = TRUE,
+                  position = "center") %>%
+    column_spec(1, bold = T, width = '3cm') %>%
+    column_spec(2, width = '3cm') %>% 
+    column_spec(3, width = '3cm') %>% 
+    column_spec(4, width = '3cm') %>% 
+    column_spec(5, width = '3cm') %>%
+    column_spec(6, width = '3cm') %>%
+    add_header_above(c(" ", "Projected date to reach 90% coverage" = 5))
+```
+
+# Appendix A
+```{r}
+
+prop <- tibble(
+    #category = factor(rep(1:4, 116), labels = list("1"="Definitely will", "2"="Probably will", "3"="Probably won't", "4"="Definitely won't")),
+    propensity = rep(c(0.1, 0.05, 0.005, 0.001), each = 29),
+    day = rep(0:28, 4),
+    p = dbinom(day, 28, propensity)
+    ) %>% 
+    pivot_wider(id_cols = c(propensity),
+                   names_from = day,
+                   names_prefix = 'day',
+                   values_from = p) %>%
+    mutate(cat0 = round(100*day0,),
+           cat1 = round(100*rowSums(select(., day1:day3))),
+           cat2 = round(100*rowSums(select(., day4:day28))),
+           category = c("Definitely will (%)", "Probably will (%)", "Probably won't (%)", "Definitely won't (%)")
+    ) %>% 
+    select(category, propensity, cat0, cat1, cat2)
+    
+
+    kbl(prop,
+        format = 'html',
+        booktabs = TRUE,
+        linesep = '',
+        format.args = list(digits = 2, scientific = FALSE, nsmall = 0),
+        label = 'projections',
+        align = c('llrrr'),
+        col.names = c("Vaccine attitude", "Daily probability", '0 days (%)', "1 - 6 days (%)", "7 - 28 days (%)"),
+        caption = "Cumulative probabilities of being available for vaccine on one or more days, based on a fixed daily probability" ) %>%
+    kable_styling(bootstrap_options = c("hover", "striped", "HOLD_position"),
+                  full_width = TRUE,
+                  position = "center") %>%
+    column_spec(1, width = '3cm') %>%
+    column_spec(2, width = '3cm') %>% 
+    column_spec(3, width = '2cm') %>% 
+    column_spec(4, width = '2cm') %>% 
+    column_spec(5, width = '2cm') %>%
+    add_header_above(c(" " = 2, "Percent available for given number of days in a 28 day period" = 3))
+
+```
+
